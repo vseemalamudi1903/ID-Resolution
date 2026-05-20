@@ -94,6 +94,57 @@ The system automatically calculates interest scores using the following weights:
 - `page_view`: 1.0
 - `client_event`: 1.0
 
+## Testing with `curl`
+
+You can test the identity resolution logic using the provided `test_api.sh` script or by running manual commands.
+
+### Using the Test Script
+
+This script simulates a full customer journey: Anonymous -> Known (Email) -> Loyalty.
+
+1.  **Ensure the server is running** (either locally or on GCP).
+2.  **Run the script**:
+    ```bash
+    # For local testing
+    ./test_api.sh http://127.0.0.1:8000
+
+    # For GCP testing
+    ./test_api.sh https://your-cloud-run-url.a.run.app
+    ```
+    *Note: The script requires `jq` for pretty-printing JSON.*
+
+### Manual Command Examples
+
+#### 1. Track an Anonymous Event
+Ingest a page view from an anonymous user.
+```bash
+curl -X POST "http://127.0.0.1:8000/track" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "identifiers": [{"type": "cookie_id", "value": "anon_123"}],
+       "traits": [{"type": "ip", "value": "1.1.1.1"}, {"type": "fingerprint", "value": "fp_123"}],
+       "event": {"event_type": "page_view", "category": "Electronics"}
+     }'
+```
+
+#### 2. Link Email to anonymous profile
+```bash
+curl -X POST "http://127.0.0.1:8000/track" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "identifiers": [
+         {"type": "cookie_id", "value": "anon_123"},
+         {"type": "email", "value": "john@example.com"}
+       ],
+       "event": {"event_type": "product_view", "category": "Electronics"}
+     }'
+```
+
+#### 3. Retrieve Profile
+```bash
+curl "http://127.0.0.1:8000/profile/email/john@example.com"
+```
+
 ## Deployment to Google Cloud Platform (GCP)
 
 You can deploy this application to **Google Cloud Run** directly from the Cloud Console.
