@@ -93,3 +93,33 @@ The system automatically calculates interest scores using the following weights:
 - `product_view`: 2.0
 - `page_view`: 1.0
 - `client_event`: 1.0
+
+## Deployment to Google Cloud Platform (GCP)
+
+You can deploy this application to **Google Cloud Run** directly from the Cloud Console.
+
+### Step-by-Step Guide
+
+1.  **Open Cloud Shell**: Click the "Activate Cloud Shell" button in the top right of the [GCP Console](https://console.cloud.google.com/).
+2.  **Clone/Upload Code**: Clone this repository into your Cloud Shell environment.
+    ```bash
+    git clone <your-repo-url>
+    cd ID-Resolution
+    ```
+3.  **Build and Deploy with Cloud Run**:
+    Run the following command to build the container image and deploy it:
+    ```bash
+    gcloud run deploy id-resolution-api \
+      --source . \
+      --region us-central1 \
+      --allow-unauthenticated \
+      --platform managed
+    ```
+    *Note: GCP will automatically use the included `Dockerfile` to build the image via Cloud Build.*
+
+4.  **Verify Deployment**:
+    Once the command finishes, it will provide a Service URL (e.g., `https://id-resolution-api-xxxxx.a.run.app`). You can test the `/health` endpoint or use the interactive `/docs` UI.
+
+### Production Considerations for GCP
+- **Database**: The current implementation uses local SQLite. For production on GCP, switch to **Cloud SQL (PostgreSQL)** by updating the `SQLALCHEMY_DATABASE_URL` in `app/database.py` and using environment variables.
+- **Persistence**: Cloud Run is stateless. Files stored on the container (like `id_resolution.db`) will be lost when the instance scales down.
