@@ -6,7 +6,9 @@ A real-time identity resolution engine built with FastAPI and SQLAlchemy. This s
 
 - **Identity Graph**: Canonical ID mapping with support for multiple identifier types (Email, Phone, Loyalty ID, Cookie ID).
 - **Deterministic Matching**: Exact matching on identifiers, with weighted priority for Loyalty IDs.
+
 - **Probabilistic Matching**: Automatic profile linking based on trait overlaps (requiring both IP and Browser Fingerprint match).
+
 - **Automatic Profile Merging**: Merges histories, traits, and interest scores when identities are linked.
 - **Behavioral Tracking**: Real-time ingestion of customer events (page views, reviews, purchases).
 - **Interest Scoring**: Cumulative scoring based on weighted event analysis.
@@ -16,6 +18,8 @@ A real-time identity resolution engine built with FastAPI and SQLAlchemy. This s
 
 - **FastAPI**: Modern, high-performance web framework.
 - **SQLAlchemy**: Powerful SQL Toolkit and ORM.
+
+
 - **SQLite**: Local database for development and testing.
 - **Pytest**: For comprehensive integration testing.
 
