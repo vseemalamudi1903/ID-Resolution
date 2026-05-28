@@ -1,99 +1,59 @@
-# Identity Resolution & Customer Tracking System
+# RIAES: Autonomous Retail Intelligence for Autonomous Decisioning & Execution
 
-A real-time identity resolution engine built with FastAPI and SQLAlchemy. This system tracks customer behavior across different states (unknown, partially known, and loyalty members) and unifies their data into a single canonical profile.
+RIAES (Retail Intelligence Autonomous Execution System) is an Agentic AI-powered platform that unifies enterprise data with advanced optimization capabilities to drive real-time, closed-loop decisions across pricing, assortment, promotions, and operations.
 
 ## Features
 
-- **Identity Graph**: Canonical ID mapping with support for multiple identifier types (Email, Phone, Loyalty ID, Cookie ID).
-- **Deterministic Matching**: Exact matching on identifiers, with weighted priority for Loyalty IDs.
-
-- **Probabilistic Matching**: Automatic profile linking based on trait overlaps (requiring both IP and Browser Fingerprint match).
-
-- **Automatic Profile Merging**: Merges histories, traits, and interest scores when identities are linked.
-- **Behavioral Tracking**: Real-time ingestion of customer events (page views, reviews, purchases).
-- **Interest Scoring**: Cumulative scoring based on weighted event analysis.
-- **Atomic Transactions**: Ensures data integrity with single-commit resolution processes.
+- **Agentic AI Layer**: 9 specialized agents (Pricing, Inventory, Strategy, Assortment, etc.) built with **PydanticAI**.
+- **Independent Scraper Agent**: API-accessible web scraper with template-based logic for major retailers (Amazon, Walmart, Target, Dick's).
+- **Governance Hub**: Human-in-the-Loop (HITL) portal for approving AI-generated decisions.
+- **Enterprise Integration**: Unified data models for Products, Inventory, and Competitor Intelligence.
 
 ## Tech Stack
 
-- **FastAPI**: Modern, high-performance web framework.
-- **SQLAlchemy**: Powerful SQL Toolkit and ORM.
+- **FastAPI**: Backend API and Portal.
+- **PydanticAI**: Agentic framework.
+- **SQLAlchemy**: ORM with SQLite database.
+- **Tailwind CSS**: Responsive Governance Portal.
+- **Matplotlib**: Architecture visualization.
 
+## Architecture
 
-- **SQLite**: Local database for development and testing.
-- **Pytest**: For comprehensive integration testing.
+![Architecture](architecture_diagram.png)
 
 ## Getting Started
 
-### Prerequisites
-
-- Python 3.10+
-
 ### Installation
 
-1. Clone the repository.
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-### Running the Application
-
-Start the FastAPI server:
 ```bash
-uvicorn app.main:app --reload
-```
-The API will be available at `http://127.0.0.1:8000`. You can access the interactive documentation at `http://127.0.0.1:8000/docs`.
-
-### Running Tests
-
-Run the integration test suite:
-```bash
-PYTHONPATH=. pytest
+pip install -r requirements.txt
 ```
 
-## API Usage Examples
-
-### 1. Track an Anonymous Event
-Ingest a page view from an anonymous user with a cookie and browser traits.
+### Initializing the Database
 
 ```bash
-curl -X POST "http://127.0.0.1:8000/track" \
+PYTHONPATH=. python3 riaes/scripts/init_db.py
+PYTHONPATH=. python3 riaes/scripts/generate_data.py
+```
+
+### Running the Platform
+
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+Access the Portal at `http://localhost:8000/portal/`
+
+## API Usage
+
+### 1. Trigger an Agent
+```bash
+curl -X POST "http://localhost:8000/api/v1/agents/pricing/run?sku=DSG-1001"
+```
+
+### 2. Use the Scraper Agent
+```bash
+curl -X POST "http://localhost:8000/api/v1/scraper/scrape" \
      -H "Content-Type: application/json" \
-     -d '{
-       "identifiers": [{"type": "cookie_id", "value": "anon_123"}],
-       "traits": [{"type": "ip", "value": "192.168.1.1"}, {"type": "fingerprint", "value": "browser_x"}],
-       "event": {"event_type": "page_view", "category": "Electronics"}
-     }'
+     -d '{"url": "https://www.amazon.com/product/123"}'
 ```
-
-### 2. Link to an Email (Partial Knowledge)
-When the user provides an email, the system will link it to the existing anonymous profile.
-
-```bash
-curl -X POST "http://127.0.0.1:8000/track" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "identifiers": [
-         {"type": "cookie_id", "value": "anon_123"},
-         {"type": "email", "value": "john@example.com"}
-       ],
-       "event": {"event_type": "product_view", "category": "Electronics"}
-     }'
-```
-
-### 3. Retrieve a Unified Profile
-Get the full canonical view of a customer using any of their identifiers.
-
-```bash
-curl "http://127.0.0.1:8000/profile/email/john@example.com"
-```
-
-## Interest Scoring Weights
-
-The system automatically calculates interest scores using the following weights:
-- `purchase`: 5.0
-- `customer_review`: 3.0
-- `product_view`: 2.0
-- `page_view`: 1.0
-- `client_event`: 1.0

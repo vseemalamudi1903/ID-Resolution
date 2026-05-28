@@ -1,6 +1,11 @@
 fastapi
 uvicorn
+jinja2
 sqlalchemy
-pydantic
+pydantic-ai
+beautifulsoup4
+requests
+matplotlib
+playwright
 pytest
 httpx
